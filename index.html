@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Motivational Stopwatch 💖</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Courier+Prime&display=swap');
+
+:root {
+    --soft-pink: #ffc0cb;
+    --dark-pink: #d1477f;
+    --light-pink: #ffe4e1;
+    --button-pink: #ff69b4;
+    --button-hover: #ff85c1;
+    --shadow-glow: rgba(255, 192, 203, 0.5);
+    --text-color: #d1477f;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Courier Prime', monospace;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    background: linear-gradient(135deg, #ffd1dc, #ffb6c1);
+    min-height: 100vh;
+    padding-top: 40px;
+}
+
+#container {
+    background-color: var(--light-pink);
+    border-radius: 28px;
+    border: 6px solid var(--soft-pink);
+    box-shadow: 0 0 40px var(--shadow-glow);
+    max-width: 450px;
+    width: 90%;
+    padding: 28px 36px 40px 36px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+h1 {
+    font-size: 2.5rem;
+    margin: 0 0 20px 0;
+    font-weight: 700;
+    color: var(--dark-pink);
+    text-shadow: 0 0 12px #ffb6c1;
+}
+
+.gif-container {
+    width: 360px;
+    height: 220px;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 5px solid var(--soft-pink);
+    box-shadow: inset 0 0 25px #fff0f5, 0 0 25px var(--soft-pink);
+    margin-bottom: 25px;
+    background: #fff0f5;
+}
+
+.gif-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.stopwatch {
+    background: var(--soft-pink);
+    padding: 25px 35px;
+    border-radius: 22px;
+    box-shadow: 0 0 20px var(--shadow-glow);
+    margin-bottom: 25px;
+    color: var(--dark-pink);
+    font-size: 2rem;
+    min-width: 360px;
+    text-align: center;
+}
+
+.buttons {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.buttons button {
+    padding: 12px 25px;
+    font-size: 1rem;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+    background: var(--button-pink);
+    color: #fff;
+    box-shadow: 0 0 12px rgba(255,105,180,0.5);
+}
+
+.buttons button:hover {
+    background: var(--button-hover);
+    transform: scale(1.05);
+}
+
+.buttons button:active {
+    transform: scale(0.95);
+}
+
+.history {
+    background: rgba(255,192,203,0.2);
+    border-radius: 15px;
+    padding: 15px;
+    width: 100%;
+    max-height: 180px;
+    overflow-y: auto;
+    color: var(--dark-pink);
+    box-shadow: 0 0 12px rgba(255,192,203,0.3);
+}
+
+.history h2 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+.history ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.history li {
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(255,192,203,0.4);
+}
+
+@media (max-width: 480px) {
+    .gif-container, .stopwatch {
+        width: 90%;
+    }
+}
+</style>
+</head>
+<body>
+
+<div id="container">
+    <h1>💖💖💖💖</h1>
+
+    <div class="gif-container">
+        <img id="motivationalGif" src="" alt="Motivational GIF">
+    </div>
+
+    <div class="stopwatch" id="stopwatch">00:00:00:00</div>
+
+    <div class="buttons">
+        <button onclick="startStopwatch()">Start</button>
+        <button onclick="pauseStopwatch()">Pause</button>
+        <button onclick="resetStopwatch()">Reset</button>
+    </div>
+
+    <div class="history">
+        <h2>History</h2>
+        <ul id="historyList"></ul>
+    </div>
+</div>
+
+<script>
+    // Stopwatch logic
+    let hrs = 0, mins = 0, secs = 0, ms = 0;
+    let timer = null;
+    let running = false;
+
+    const display = document.getElementById('stopwatch');
+    const historyList = document.getElementById('historyList');
+
+    function updateDisplay() {
+        display.textContent = 
+            `${String(hrs).padStart(2,'0')}:` +
+            `${String(mins).padStart(2,'0')}:` +
+            `${String(secs).padStart(2,'0')}:` +
+            `${String(ms).padStart(2,'0')}`;
+    }
+
+    function startStopwatch() {
+        if (!running) {
+            running = true;
+            timer = setInterval(() => {
+                ms += 1;
+                if (ms >= 100) { ms = 0; secs += 1; }
+                if (secs >= 60) { secs = 0; mins += 1; }
+                if (mins >= 60) { mins = 0; hrs += 1; }
+                updateDisplay();
+            }, 10);
+        }
+    }
+
+    function pauseStopwatch() {
+        if (running) {
+            clearInterval(timer);
+            running = false;
+            saveTime();
+        }
+    }
+
+    function resetStopwatch() {
+        if (running) {
+            clearInterval(timer);
+            running = false;
+        }
+        saveTime();
+        hrs = 0; mins = 0; secs = 0; ms = 0;
+        updateDisplay();
+    }
+
+    function saveTime() {
+        const timeString = display.textContent;
+        if(timeString !== "00:00:00:00") {
+            const li = document.createElement('li');
+            li.textContent = timeString;
+            historyList.prepend(li);
+        }
+    }
+
+    // GIF logic
+    const gifs = [
+        'assets/1.gif',
+        'assets/2.gif',
+        'assets/3.gif',
+        'assets/4.gif',
+        'assets/5.gif',
+        'assets/6.gif'
+    ];
+    let gifIndex = 0;
+    const gifElement = document.getElementById('motivationalGif');
+
+    function showNextGif() {
+        gifElement.src = gifs[gifIndex];
+        gifIndex = (gifIndex + 1) % gifs.length;
+    }
+
+    showNextGif();
+    setInterval(showNextGif, 5000);
+</script>
+
+</body>
+</html>
